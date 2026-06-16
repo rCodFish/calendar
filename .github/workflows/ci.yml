@@ -10,7 +10,6 @@ jobs:
   test:
     name: Build & Test
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -28,22 +27,15 @@ jobs:
           chrome-version: stable
 
       - name: Run all tests
-        run: mvn -B clean verify -Dsurefire.printSummary=true
+        run: mvn -B clean verify --no-transfer-progress
 
-      - name: Upload Surefire & Failsafe reports
+      - name: Publish Test Results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: dorny/test-reporter@v1
         with:
-          name: test-reports
+          name: Maven Tests          
           path: |
-            target/surefire-reports/
-            target/failsafe-reports/
-          retention-days: 14
-
-      - name: Publish Test Report
-        if: always()
-        uses: mikepenz/action-junit-report@v4
-        with:
-          report_paths: |
             target/surefire-reports/*.xml
             target/failsafe-reports/*.xml
+          reporter: java-junit       
+          fail-on-error: false       
