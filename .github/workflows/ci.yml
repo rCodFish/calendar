@@ -42,30 +42,3 @@ jobs:
           only-summary: true
           list-suites: failed
           list-tests: failed
-
-      - name: Test Summary
-        if: always()
-        run: |
-          echo "=================================================================="
-          echo "TEST SUMMARY"
-          echo "=================================================================="
-          
-          # Count results from Surefire
-          PASSED=$(grep -oP 'Tests run: \d+, Failures: \d+, Errors: \d+, Skipped: \d+' target/surefire-reports/*.txt | tail -1 | grep -oP '\d+' | head -1 || echo "0")
-          FAILED=$(grep -oP 'Tests run: \d+, Failures: \d+, Errors: \d+, Skipped: \d+' target/surefire-reports/*.txt | tail -1 | grep -oP '\d+' | sed -n '2p' || echo "0")
-          
-          echo "Total Tests: $((PASSED + FAILED))"
-          echo "✅ Passed : $PASSED"
-          echo "❌ Failed : $FAILED"
-          
-          if [ "$FAILED" -gt 0 ]; then
-            echo ""
-            echo "❌ Failing test(s):"
-            grep -B5 -A10 "Expecting value to be true but was false" target/surefire-reports/*.txt || true
-            echo ""
-            echo " Check the 'JUnit Test Results' section above for full details."
-          else
-            echo "✅ All tests passed!"
-          fi
-          
-          echo "=================================================================="
